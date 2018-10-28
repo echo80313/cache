@@ -8,7 +8,7 @@ import (
 )
 
 func TestNonCachePutAndGet(t *testing.T) {
-	c := cache.NewNonCache(NewSlowResource(), 100)
+	c := cache.NewNonCache(NewSlowResource())
 	key := "key1"
 	value := "val1"
 	c.Put(key, value)
@@ -29,18 +29,38 @@ func BenchmarkGet100(b *testing.B) {
 	benchmarkGet(100, b)
 }
 
-func BenchmarkGet1000(b *testing.B) {
-	benchmarkGet(1000, b)
-}
-
 func benchmarkGet(n int, b *testing.B) {
 	res := NewSlowResource()
 	key := "key1"
 	value := "val1"
 	res.FastPut(key, value)
 
-	c := cache.NewNonCache(res, 100)
+	c := cache.NewNonCache(res)
 	for i := 0; i < n; i++ {
 		c.Get(key)
+	}
+}
+
+func BenchmarkPutAndGet1(b *testing.B) {
+	benchmarkPutAndGet(GenRandomOps(1), b)
+}
+
+func BenchmarkPutAndGet10(b *testing.B) {
+	benchmarkPutAndGet(GenRandomOps(10), b)
+}
+
+func BenchmarkPutAndGet100(b *testing.B) {
+	benchmarkPutAndGet(GenRandomOps(100), b)
+}
+
+func benchmarkPutAndGet(ops []*Op, b *testing.B) {
+	c := cache.NewNonCache(NewSlowResource())
+	for _, op := range ops {
+		switch op.t {
+		case GetOp:
+			c.Get(op.key)
+		case PutOp:
+			c.Put(op.key, op.val)
+		}
 	}
 }

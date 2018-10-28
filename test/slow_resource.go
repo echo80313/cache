@@ -16,12 +16,12 @@ func NewSlowResource() *slowResource {
 }
 
 func (r *slowResource) Get(key string) interface{} {
-	<-time.After(100 * time.Millisecond)
+	<-time.After(50 * time.Millisecond)
 	return r.store[key]
 }
 
 func (r *slowResource) Put(key string, val interface{}) error {
-	<-time.After(500 * time.Millisecond)
+	<-time.After(250 * time.Millisecond)
 	return r.FastPut(key, val)
 }
 

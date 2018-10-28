@@ -4,7 +4,7 @@ type NonCache struct {
 	resource Resource
 }
 
-func NewNonCache(resource Resource, sz int) *NonCache {
+func NewNonCache(resource Resource) *NonCache {
 	return &NonCache{
 		resource: resource,
 	}
