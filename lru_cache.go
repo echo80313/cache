@@ -1,6 +1,11 @@
 package cache
 
+import (
+	"errors"
+)
+
 type cacheNode struct {
+	key  string
 	data interface{}
 	next *cacheNode
 	prev *cacheNode
@@ -13,8 +18,22 @@ type lruCacheNodeList struct {
 	// Store the key -> cachenode mapping.
 	index map[string]*cacheNode
 
-	sz  int
 	cap int
+}
+
+func newLruCacheNodeList(cap int) *lruCacheNodeList {
+	head := &cacheNode{} // sentinal node
+	tail := &cacheNode{} // tail sentinal node
+	head.prev = head
+	head.next = tail
+	tail.prev = head
+	tail.next = tail
+	return &lruCacheNodeList{
+		cap:   cap,
+		head:  head,
+		tail:  tail,
+		index: make(map[string]*cacheNode),
+	}
 }
 
 func (l *lruCacheNodeList) Access(key string) (interface{}, bool) {
@@ -29,10 +48,14 @@ func (l *lruCacheNodeList) Access(key string) (interface{}, bool) {
 // have in cache
 func (l *lruCacheNodeList) Add(key string, val interface{}) {
 	node := &cacheNode{
+		key:  key,
 		data: val,
 	}
 	l.index[key] = node
 	l.AddToHead(node)
+	if l.getSize() > l.cap {
+		l.popTail()
+	}
 }
 
 func (l *lruCacheNodeList) removeNode(node *cacheNode) {
@@ -45,16 +68,22 @@ func (l *lruCacheNodeList) moveToHead(node *cacheNode) {
 	l.AddToHead(node)
 }
 
+func (l *lruCacheNodeList) popTail() {
+	nodeToPurge := l.tail.prev
+	l.removeNode(nodeToPurge)
+	delete(l.index, nodeToPurge.key)
+	l.tail.prev = nodeToPurge.prev // deference so that GC can clean it up
+}
+
+func (l *lruCacheNodeList) getSize() int {
+	return len(l.index)
+}
+
 func (l *lruCacheNodeList) AddToHead(node *cacheNode) {
 	node.next = l.head.next
 	node.prev = l.head
 	l.head.next.prev = node
 	l.head.next = node
-
-	if l.sz > l.cap {
-		l.removeNode(l.tail)
-		l.tail = l.tail.prev
-	}
 }
 
 type LRUCache struct {
@@ -89,7 +118,7 @@ func (c *LRUCache) Get(key string) (interface{}, error) {
 }
 
 func (c *LRUCache) Put(key string, val interface{}) error {
-	return nil
+	return errors.New("Not implemented")
 }
 
 // make sure cache is kind of resource

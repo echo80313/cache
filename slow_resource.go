@@ -1,7 +1,6 @@
-package test
+package cache
 
 import (
-	"cache"
 	"errors"
 	"fmt"
 	"time"
@@ -38,4 +37,4 @@ func (r *slowResource) FastPut(key string, val interface{}) error {
 	return errors.New("Invalid value type")
 }
 
-var _ cache.Resource = &slowResource{}
+var _ Resource = &slowResource{}

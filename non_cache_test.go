@@ -1,20 +1,19 @@
-package test
+package cache
 
 import (
-	"cache"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNonCachePutAndGet(t *testing.T) {
-	c := cache.NewNonCache(NewSlowResource())
+	c := NewNonCache(NewSlowResource())
 	key := "key1"
 	value := "val1"
 	c.Put(key, value)
 	v, err := c.Get(key)
 	assert.Nil(t, err)
-	assert.Equal(t, v, value)
+	assert.Equal(t, value, v)
 
 	// Get nonexist-key
 	_, err = c.Get("non-exist")
@@ -38,7 +37,7 @@ func benchmarkGet(n int, b *testing.B) {
 	value := "val1"
 	res.FastPut(key, value)
 
-	c := cache.NewNonCache(res)
+	c := NewNonCache(res)
 	for i := 0; i < n; i++ {
 		c.Get(key)
 	}
@@ -57,7 +56,7 @@ func BenchmarkPutAndGet100(b *testing.B) {
 }
 
 func benchmarkPutAndGet(ops []*Op, b *testing.B) {
-	c := cache.NewNonCache(NewSlowResource())
+	c := NewNonCache(NewSlowResource())
 	for _, op := range ops {
 		switch op.t {
 		case GetOp:
