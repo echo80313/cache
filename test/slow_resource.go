@@ -1,7 +1,9 @@
 package test
 
 import (
+	"cache"
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -15,9 +17,12 @@ func NewSlowResource() *slowResource {
 	}
 }
 
-func (r *slowResource) Get(key string) interface{} {
+func (r *slowResource) Get(key string) (interface{}, error) {
 	<-time.After(50 * time.Millisecond)
-	return r.store[key]
+	if v, ok := r.store[key]; ok {
+		return v, nil
+	}
+	return nil, fmt.Errorf("Key not exists %s", key)
 }
 
 func (r *slowResource) Put(key string, val interface{}) error {
@@ -32,3 +37,5 @@ func (r *slowResource) FastPut(key string, val interface{}) error {
 	}
 	return errors.New("Invalid value type")
 }
+
+var _ cache.Resource = &slowResource{}

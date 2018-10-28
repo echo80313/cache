@@ -21,3 +21,11 @@ func randString(length int) string {
 	}
 	return str
 }
+
+func genKeyValueSet(sz, keySize, valueSize int) map[string]interface{} {
+	kvSet := make(map[string]interface{})
+	for i := 0; i < sz; i++ {
+		kvSet[randString(keySize)] = randString(valueSize)
+	}
+	return kvSet
+}

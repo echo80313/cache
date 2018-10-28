@@ -1,7 +1,7 @@
 package cache
 
 type Resource interface {
-	Get(string) interface{}
+	Get(string) (interface{}, error)
 	Put(string, interface{}) error
 }
 

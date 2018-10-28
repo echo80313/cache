@@ -12,10 +12,13 @@ func TestNonCachePutAndGet(t *testing.T) {
 	key := "key1"
 	value := "val1"
 	c.Put(key, value)
-	assert.Equal(t, c.Get(key), value)
+	v, err := c.Get(key)
+	assert.Nil(t, err)
+	assert.Equal(t, v, value)
 
 	// Get nonexist-key
-	assert.Equal(t, c.Get("Non-exist"), "")
+	_, err = c.Get("non-exist")
+	assert.NotNil(t, err)
 }
 
 func BenchmarkGet1(b *testing.B) {

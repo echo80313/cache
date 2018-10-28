@@ -10,7 +10,7 @@ func NewNonCache(resource Resource) *NonCache {
 	}
 }
 
-func (c *NonCache) Get(key string) interface{} {
+func (c *NonCache) Get(key string) (interface{}, error) {
 	return c.resource.Get(key)
 }
 
