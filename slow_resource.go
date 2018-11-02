@@ -6,18 +6,25 @@ import (
 	"time"
 )
 
+/**
+slowResource simulates a resources with high latency such as i/o, network,...
+*/
 type slowResource struct {
-	store map[string]string
+	store      map[string]string
+	getLatency int
+	putLatency int
 }
 
-func NewSlowResource() *slowResource {
+func NewSlowResource(getLatency, putLatency int) *slowResource {
 	return &slowResource{
-		store: make(map[string]string),
+		store:      make(map[string]string),
+		getLatency: getLatency,
+		putLatency: putLatency,
 	}
 }
 
 func (r *slowResource) Get(key string) (interface{}, error) {
-	<-time.After(50 * time.Millisecond)
+	<-time.After(time.Duration(r.getLatency) * time.Millisecond)
 	if v, ok := r.store[key]; ok {
 		return v, nil
 	}
@@ -25,7 +32,7 @@ func (r *slowResource) Get(key string) (interface{}, error) {
 }
 
 func (r *slowResource) Put(key string, val interface{}) error {
-	<-time.After(250 * time.Millisecond)
+	<-time.After(time.Duration(r.putLatency) * time.Millisecond)
 	return r.FastPut(key, val)
 }
 
